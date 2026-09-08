@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Phone, Shield, CheckCircle, Lock, ArrowRight, HeartHandshake, Home, FileText, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { Phone, Shield, CheckCircle, Lock, ArrowRight, HeartHandshake, Home, FileText, Loader2, Building2 } from 'lucide-react';
 
 export default function Page() {
   const [formData, setFormData] = useState({
@@ -39,7 +40,7 @@ export default function Page() {
       } else {
         setErrorMsg(resData.error || 'Something went wrong. Please try again.');
       }
-    } catch (err) {
+    } catch {
       setErrorMsg('Network error. Please try calling us directly at (725) 273-9245.');
     } finally {
       setLoading(false);
@@ -52,22 +53,44 @@ export default function Page() {
       {/* 1. HEADER BAR */}
       <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="bg-blue-900 text-white p-2 rounded-lg font-bold text-xl tracking-wider">
-              PLG
-            </div>
-            <div>
-              <span className="font-bold text-slate-900 text-lg block leading-tight">Property Lifeline</span>
-              <span className="text-xs text-slate-500 tracking-wide uppercase font-semibold">Group</span>
-            </div>
+          <div className="flex items-center space-x-6">
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="bg-blue-900 text-white p-2 rounded-lg font-bold text-xl tracking-wider">
+                PLG
+              </div>
+              <div>
+                <span className="font-bold text-slate-900 text-lg block leading-tight">Property Lifeline</span>
+                <span className="text-xs text-slate-500 tracking-wide uppercase font-semibold">Group</span>
+              </div>
+            </Link>
+
+            <nav className="hidden sm:flex items-center space-x-2 pl-4 border-l border-slate-200 text-xs md:text-sm font-medium">
+              <span className="text-blue-900 font-bold bg-blue-50 px-3 py-1 rounded-lg">Homeowners</span>
+              <Link 
+                href="/investors" 
+                className="text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 px-3 py-1 rounded-lg transition font-medium flex items-center gap-1.5"
+              >
+                <Building2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Investors &amp; Cash Buyers</span>
+              </Link>
+            </nav>
           </div>
-          <a 
-            href="tel:7252739245" 
-            className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-semibold transition shadow-sm text-sm md:text-base"
-          >
-            <Phone className="w-4 h-4 fill-current" />
-            <span>(725) 273-9245</span>
-          </a>
+
+          <div className="flex items-center space-x-3">
+            <Link 
+              href="/investors" 
+              className="sm:hidden text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg"
+            >
+              Investors
+            </Link>
+            <a 
+              href="tel:7252739245" 
+              className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-semibold transition shadow-sm text-sm md:text-base"
+            >
+              <Phone className="w-4 h-4 fill-current" />
+              <span>(725) 273-9245</span>
+            </a>
+          </div>
         </div>
       </header>
 
@@ -279,6 +302,13 @@ export default function Page() {
 
       {/* 5. FOOTER */}
       <footer className="bg-slate-900 text-white py-10 px-4 border-t border-slate-800 text-center space-y-4">
+        <div className="flex items-center justify-center space-x-4 text-xs text-slate-400">
+          <Link href="/" className="hover:text-white transition">Homeowners</Link>
+          <span>&bull;</span>
+          <Link href="/investors" className="text-emerald-400 hover:text-emerald-300 font-semibold transition">Investors &amp; Cash Buyers</Link>
+          <span>&bull;</span>
+          <a href="tel:7252739245" className="hover:text-white transition">(725) 273-9245</a>
+        </div>
         <p className="text-sm text-slate-400">
           &copy; {new Date().getFullYear()} Property Lifeline Group. All rights reserved. Confidentiality guaranteed.
         </p>

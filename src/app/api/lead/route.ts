@@ -11,20 +11,51 @@ function getSupabase(): SupabaseClient | null {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { full_name, property_address, phone, email, primary_goal } = body;
+    const {
+      full_name,
+      property_address,
+      phone,
+      email,
+      primary_goal,
+      lead_type = 'homeowner',
+      company,
+      company_name,
+      preferred_deal_type,
+      target_zip_codes
+    } = body;
 
-    if (!full_name || !property_address || !phone || !email) {
-      return NextResponse.json(
-        { error: 'Please fill in all required fields.' },
-        { status: 400 }
-      );
+    if (lead_type === 'investor') {
+      if (!full_name || !phone || !email) {
+        return NextResponse.json(
+          { error: 'Please fill in all required fields (Name, Phone, Email).' },
+          { status: 400 }
+        );
+      }
+    } else {
+      if (!full_name || !property_address || !phone || !email) {
+        return NextResponse.json(
+          { error: 'Please fill in all required fields.' },
+          { status: 400 }
+        );
+      }
     }
 
     const supabase = getSupabase();
     if (supabase) {
-      const { error } = await supabase
-        .from('leads')
-        .insert([{ full_name, property_address, phone, email, primary_goal, status: 'New' }]);
+      const payload: Record<string, unknown> = {
+        full_name,
+        phone,
+        email,
+        lead_type,
+        status: 'New'
+      };
+      if (property_address) payload.property_address = property_address;
+      if (primary_goal) payload.primary_goal = primary_goal;
+      if (company || company_name) payload.company = company || company_name;
+      if (preferred_deal_type) payload.preferred_deal_type = preferred_deal_type;
+      if (target_zip_codes) payload.target_zip_codes = target_zip_codes;
+
+      const { error } = await supabase.from('leads').insert([payload]);
       if (error) console.error('Supabase save error:', error);
     }
 
@@ -36,11 +67,7 @@ export async function POST(request: Request) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            full_name,
-            property_address,
-            phone,
-            email,
-            primary_goal,
+            ...body,
             submitted_at: new Date().toISOString()
           })
         });
@@ -49,7 +76,7 @@ export async function POST(request: Request) {
       }
     } else {
       console.log('--- NEW LEAD RECEIVED (LOG ONLY) ---');
-      console.log({ full_name, property_address, phone, email, primary_goal });
+      console.log(body);
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
