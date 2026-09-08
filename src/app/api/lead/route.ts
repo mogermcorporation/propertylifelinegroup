@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+function getSupabase(): SupabaseClient | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+}
 
 export async function POST(request: Request) {
   try {
@@ -38,8 +40,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // 1. Save to Supabase (Optional Database Log)
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const supabase = getSupabase();
+    if (supabase) {
       const payload: Record<string, unknown> = {
         full_name,
         phone,
@@ -53,14 +55,10 @@ export async function POST(request: Request) {
       if (preferred_deal_type) payload.preferred_deal_type = preferred_deal_type;
       if (target_zip_codes) payload.target_zip_codes = target_zip_codes;
 
-      const { error } = await supabase
-        .from('leads')
-        .insert([payload]);
-        
+      const { error } = await supabase.from('leads').insert([payload]);
       if (error) console.error('Supabase save error:', error);
     }
 
-    // 2. Send to Google Sheets / Vapi Trigger Webhook (Make.com, Zapier, or Apps Script)
     const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL || process.env.NOTIFICATION_WEBHOOK_URL;
 
     if (webhookUrl) {
@@ -82,7 +80,6 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
-
   } catch (err) {
     console.error('API Error:', err);
     return NextResponse.json({ error: 'Server error occurred.' }, { status: 500 });
