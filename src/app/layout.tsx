@@ -13,11 +13,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Property Lifeline Group | Las Vegas Distressed Property Solutions",
-  description: "Confidential housing options for Las Vegas homeowners facing mortgage stress, back taxes, or equity decisions.",
+  title: "Property Lifeline Group | Las Vegas Distressed Property Solutions & Off-Market Deals",
+  description: "Direct-to-seller distressed property solutions for Las Vegas homeowners and verified off-market wholesale, fix & flip, and cash flow deals for real estate investors.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
